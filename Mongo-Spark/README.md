@@ -23,12 +23,18 @@
 ##### Download and install mongo-hadoop
 * Download [mongo-hadoop](git clone https://github.com/mongodb/mongo-hadoop.git)
 * Go to the pymongo-spark directory of the project and install
+```
 	cd mongo-hadoop/spark/src/main/python
 	python setup.py install
+```
 * May need to set the environmental variable
+```
 	PYTHONPATH = %PYTHONPATH%";directory\to\mongo-hadoop\spark\src\main\python
+```
 * Install pymongo on each machine in your Spark cluster.
+```	
 	pip install pymongo
+```
 * Download 'mongo-hadoop-spark.jar' from [Maven Central Repository](http://search.maven.org/).
 
 
