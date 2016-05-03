@@ -39,8 +39,9 @@
 
 
 ##### Usage
+* `python import_data.py`
 * run `mongod` in `cmd` to start background management operations
-* spark-submit --driver-class-path mongo-hadoop-spark.jar rdd_loading.py
+* `spark-submit --driver-class-path mongo-hadoop-spark.jar rdd_loading.py`
 
 
 ### Useful links:

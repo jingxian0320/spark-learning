@@ -1,3 +1,6 @@
+# load rdd from mongodb
+# and save back as a copy
+
 from pyspark import SparkContext, SparkConf
 
 import pymongo_spark
@@ -10,8 +13,8 @@ def main():
     conf = SparkConf().setAppName("pyspark_test")
     sc = SparkContext(conf=conf)
 
-    rdd = sc.mongoRDD('mongodb://localhost:27017/test_database.transactions_small')
-    print (rdd.collect())
+    rdd = sc.mongoRDD('mongodb://localhost:27017/test_database.transactions')
+    rdd.saveToMongoDB('mongodb://localhost:27017/test_database.transactions_copy')
 
 
 if __name__ == '__main__':
