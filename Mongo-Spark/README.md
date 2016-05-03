@@ -6,13 +6,12 @@
 - Java Development Kit (JDK)
 - MongoDB
 
-
 ##### Environmental variable setting for Spark
 
 * JAVA_HOME = the value is JDK path.
-* PATH =  %PATH%;‘%JAVA_HOME%\bin’
+* PATH =  %PATH%;%JAVA_HOME%\bin
 * PYTHONPATH = python home directory plus scripts directory inside the python home directory, separated by semicolon.
-* PATH = %PATH%;‘%PYTHONPATH%’
+* PATH = %PATH%;%PYTHONPATH%
 * PYSPARK_DRIVER_PYTHON = ipython
 * PYSPARK_DRIVER_PYTHON_OPTS = notebook
 
@@ -39,9 +38,15 @@
 
 
 ##### Usage
-* `python import_data.py`
+* `python import_data.py` The py file loads the data in `data2.csv` into mongodb `test_database.transactions`
 * run `mongod` in `cmd` to start background management operations
-* `spark-submit --driver-class-path mongo-hadoop-spark.jar rdd_loading.py`
+* `spark-submit --driver-class-path mongo-hadoop-spark.jar rdd.py` The py file load the data from mongodb as rdd and save back to mongodb as `test_databse.transactions_copy`
+* check the collection in mongodb
+```
+	mongo
+	use test_database
+	db.transactions_copy.count()
+```
 
 
 ### Useful links:
