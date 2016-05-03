@@ -1,0 +1,8 @@
+README.rst
+setup.py
+pymongo_spark.egg-info/PKG-INFO
+pymongo_spark.egg-info/SOURCES.txt
+pymongo_spark.egg-info/dependency_links.txt
+pymongo_spark.egg-info/requires.txt
+pymongo_spark.egg-info/top_level.txt
+test/test_pymongo_spark.py
