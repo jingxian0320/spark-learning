@@ -46,9 +46,11 @@ CREATE TABLE users (
   product_id int,
   score int
 );
+```
 * Copy the data from the CSV file into the `transactions` table
 ```
 COPY transactions from 'data2.csv';
+```
 * cassandra_mongo.py loads the data from `transactions`, calculates the recommendations and saves the result into MongoDB.
 ```
 spark-submit \
