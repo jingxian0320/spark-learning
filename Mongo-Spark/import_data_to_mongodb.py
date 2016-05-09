@@ -5,7 +5,7 @@ import sys, getopt, pprint
 from pymongo import MongoClient
 
 #CSV to JSON Conversion
-csvfile = open('data2.csv', 'r')
+csvfile = open('..\data2.csv', 'r')
 reader = csv.DictReader( csvfile,fieldnames= [ "CustomerID", "ProductID", "Score"])
 
 mongo_client=MongoClient() 
@@ -23,4 +23,4 @@ transaction = db.transactions.find().limit(10)
 for record in transaction:
     print record
 
-print ("%d transaction records are found in the database"%db.transactions.count())
+print ("%d transaction records are saved into the database"%db.transactions.count())
