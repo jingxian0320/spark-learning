@@ -5,20 +5,38 @@ import pymongo_spark
 import time
 import recomm_cf
 
-LOAD_DATA_FROM_DB = True
-SAVE_DATA_TO_DB = True
+LOAD_DATA_FROM_DB = False
+SAVE_DATA_TO_DB = False
 
 pymongo_spark.activate()
 db_out = 'test_database'
 spark_cassandra_connection_host = "127.0.0.1"
+cassandra_keyspace = "mykeyspace"
+cassandra_table = "transactions_test"
 dbtable_out_per_user = 'recomm_per_user'
 dbtable_out_per_item = 'recomm_per_item'
+
+test_file = 'transaction_data.csv'
     
     
 def save_to_mongo(rdd, collection):
     rdd.saveToMongoDB('mongodb://localhost:27017/' + db_out + '.' + collection)
     print 'saved to ' + collection
 
+
+
+def test(data_rdd,num_to_recomm_per_user=10,num_to_recomm_per_item=10):
+    results_per_user = data_rdd.map(
+        lambda l:((l[col_tenant_id],l[col_user_id]),l[col_item_id])).reduceByKey(
+        lambda x,y: x.append(y)).map(
+        lambda l:(l[0][0],l[0][1],l[1]))
+    results_per_item = data_rdd.map(
+        lambda l:(l[col_tenant_id],l[col_item_id]),[])
+    return results_per_user,results_per_item
+
+
+
+    
 if __name__ == "__main__":
     
     t0 = time.time()
@@ -41,7 +59,7 @@ if __name__ == "__main__":
     
     if LOAD_DATA_FROM_DB:
         
-        data = sc.cassandraTable("mykeyspace", "transactions",row_format=1).collect() # row_format: tuple
+        data = sc.cassandraTable(cassandra_keyspace, cassandra_table, row_format=1).collect() # row_format: tuple
         # (id, tenant_id, user_id, item_id)
         tenant_ids = set(list(map(lambda x:x[col_tenant_id],data)))
         data_rdd = sc.parallelize(data)
@@ -57,9 +75,7 @@ if __name__ == "__main__":
                 lambda l: ((l[col_user_id],l[col_item_id]),1.0)).reduceByKey(
                 lambda x,y: x + y).map(
                 lambda x: (x[0][0],x[0][1],x[1]))
-            recomm_per_user,recomm_per_item = recomm_cf.TrainAndComputeRecommendation(sc, per_tenant_rdd,
-                                                                            num_to_recomm_per_user,
-                                                                            num_to_recomm_per_item)
+            recomm_per_user,recomm_per_item = test(sc, per_tenant_rdd,num_to_recomm_per_user,num_to_recomm_per_item)
 
             formatted_rdd_per_user = recomm_per_user.map(lambda row: (t_id,row[0],row[1]))
             all_results_per_user = all_results_per_user.union(formatted_rdd_per_user)
@@ -75,11 +91,8 @@ if __name__ == "__main__":
             print("%d recommendations per item:" % num_to_recomm_per_item)
             print(all_results_per_user.collect())
     else:
-        print ('loading...')
-        datafile = sc.textFile("data2.csv").map(lambda l: l.split(','))
-        recomm_per_user,recomm_per_item = recomm_cf.TrainAndComputeRecommendation(sc, datafile,
-                                                                        num_to_recomm_per_user,
-                                                                        num_to_recomm_per_item)
+        data_rdd = sc.textFile(test_file).map(lambda l: l.split(','))
+        recomm_per_user,recomm_per_item = test(data_rdd, num_to_recomm_per_user,num_to_recomm_per_item)
 
         if SAVE_DATA_TO_DB:
             save_to_mongo(recomm_per_user,dbtable_out_per_user)
